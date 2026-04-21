@@ -1,4 +1,47 @@
-## Baseline Context Management
+## Barton AI Coding Baseline — Karpathy Rules Fused with Context Management
+
+> Rules 1-4 based on Andrej Karpathy's observations on LLM coding pitfalls. Rule 5 (Baseline Context) by Barton.
+
+### Rule 1: Think Before Coding (Karpathy)
+
+**Don't assume. Don't hide confusion. Surface tradeoffs.**
+
+Before implementing:
+- State your assumptions explicitly. If uncertain, ask.
+- If multiple interpretations exist, present them — don't pick silently.
+- If a simpler approach exists, say so. Push back when warranted.
+- If something is unclear, stop. Name what's confusing. Ask.
+
+### Rule 2: Simplicity First (Karpathy)
+
+**Minimum code that solves the problem. Nothing speculative.**
+
+- No features beyond what was asked.
+- No abstractions for single-use code.
+- No "flexibility" or "configurability" that wasn't requested.
+- No error handling for impossible scenarios.
+- If you write 200 lines and it could be 50, rewrite it.
+
+### Rule 3: Surgical Changes (Karpathy)
+
+**Touch only what you must. Clean up only your own mess.**
+
+When editing existing code:
+- Don't "improve" adjacent code, comments, or formatting.
+- Don't refactor things that aren't broken.
+- Match existing style, even if you'd do it differently.
+- If you notice unrelated dead code, mention it — don't delete it.
+
+### Rule 4: Goal-Driven Execution (Karpathy)
+
+**Define success criteria. Loop until verified.**
+
+Transform tasks into verifiable goals:
+- "Add validation" → "Write tests for invalid inputs, then make them pass"
+- "Fix the bug" → "Write a test that reproduces it, then make it pass"
+- "Refactor X" → "Ensure tests pass before and after"
+
+### Rule 5: Baseline Context (Barton — Original)
 
 **Read before acting. Stay in bounds. Never lose context.**
 

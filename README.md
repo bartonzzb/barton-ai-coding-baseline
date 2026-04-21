@@ -1,35 +1,92 @@
-# AI Coding Baseline
+# Barton AI Coding Baseline
 
-> Stop losing context between sessions. One file, zero friction.
+> Karpathy's rules fused with cross-session context management. One file, zero friction.
 
-## The Problem
+## What Is This
 
-Karpathy's 4 rules solve **how AI codes**. BASELINE.md solves **what happens between sessions**.
+This project combines two things into a single, portable framework:
 
-Every AI coding assistant (Claude Code, Cursor, Windsurf, Copilot, WorkBuddy) has the same flaw: when a new session starts, it forgets everything. Project state, scope boundaries, in-progress tasks, forbidden zones — gone. The result:
+| Component | Origin | What It Solves |
+|-----------|--------|----------------|
+| Rules 1-4: Think Before Coding, Simplicity First, Surgical Changes, Goal-Driven Execution | Based on [Andrej Karpathy](https://github.com/karpathy)'s observations on LLM coding pitfalls | How AI codes within a session |
+| Rule 5: Baseline Context + `BASELINE.md` | Original contribution by [Barton](https://github.com/bartonzzb) | What happens between sessions |
 
-- AI re-introduces bugs you already fixed
-- AI modifies modules it shouldn't touch
-- AI "improves" code that was intentionally left as-is
-- You spend 10 minutes re-explaining context every session
+Karpathy identified that LLMs make bad assumptions, overcomplicate code, and make unrelated edits. The existing solutions (e.g., [andrej-karpathy-skills](https://github.com/forrestchang/andrej-karpathy-skills)) package his 4 rules into CLAUDE.md — but they solve only half the problem.
 
-## The Solution
+**The missing half**: when a new session starts, the AI forgets everything. Project state, scope boundaries, in-progress tasks, forbidden zones — gone. You spend 10 minutes re-explaining context every time.
 
-A single `BASELINE.md` file in your project root. The AI reads it at session start, updates it at session end. Context persists. Boundaries are enforced.
+This project fuses Karpathy's 4 rules with a 5th original rule (Baseline Context) and a `BASELINE.md` template to solve both halves.
+
+## The 5 Rules
+
+### Rule 1: Think Before Coding *(Karpathy)*
+
+**Don't assume. Don't hide confusion. Surface tradeoffs.**
+
+Before implementing:
+- State your assumptions explicitly. If uncertain, ask.
+- If multiple interpretations exist, present them — don't pick silently.
+- If a simpler approach exists, say so. Push back when warranted.
+- If something is unclear, stop. Name what's confusing. Ask.
+
+### Rule 2: Simplicity First *(Karpathy)*
+
+**Minimum code that solves the problem. Nothing speculative.**
+
+- No features beyond what was asked.
+- No abstractions for single-use code.
+- No "flexibility" or "configurability" that wasn't requested.
+- No error handling for impossible scenarios.
+- If you write 200 lines and it could be 50, rewrite it.
+
+### Rule 3: Surgical Changes *(Karpathy)*
+
+**Touch only what you must. Clean up only your own mess.**
+
+When editing existing code:
+- Don't "improve" adjacent code, comments, or formatting.
+- Don't refactor things that aren't broken.
+- Match existing style, even if you'd do it differently.
+- If you notice unrelated dead code, mention it — don't delete it.
+
+### Rule 4: Goal-Driven Execution *(Karpathy)*
+
+**Define success criteria. Loop until verified.**
+
+Transform tasks into verifiable goals:
+- "Add validation" → "Write tests for invalid inputs, then make them pass"
+- "Fix the bug" → "Write a test that reproduces it, then make it pass"
+- "Refactor X" → "Ensure tests pass before and after"
+
+### Rule 5: Baseline Context *(Barton - Original)*
+
+**Read before acting. Stay in bounds. Never lose context.**
+
+On session start:
+- If `BASELINE.md` exists in the project root, read it before responding to any request.
+- On receiving "baseline restore", read `BASELINE.md` first, restore full context, then respond.
+
+Before starting any task:
+- Read `BASELINE.md` to confirm current state and scope boundaries.
+- No out-of-scope changes without explicit owner approval.
+- No deploy/release without explicit owner approval.
+
+After completing any task:
+- Update `BASELINE.md`: completed tasks, current version, in-progress status.
+- Before ending the session, remind the owner to confirm whether `BASELINE.md` needs updating.
 
 ## Quick Start
 
 1. Copy `BASELINE.md` to your project root
 2. Fill in the fields (takes 2 minutes)
-3. Add this instruction to your AI tool's system prompt or rules file:
+3. Copy the integration file for your AI tool into the appropriate location:
 
-```
-On session start, read BASELINE.md in the project root. 
-Before any task, confirm current state and scope boundaries. 
-After completing any task, update BASELINE.md.
-```
-
-That's it. No config files, no plugins, no dependencies.
+| Tool | File | Location |
+|------|------|----------|
+| Claude Code | `integrations/claude-code/CLAUDE.md` | Project root or `.claude/settings.json` |
+| Cursor | `integrations/cursor/baseline-rules.mdc` | `.cursor/rules/` |
+| Windsurf | `integrations/windsurf/.windsurfrules` | Project root |
+| GitHub Copilot | `integrations/copilot/copilot-instructions.md` | `.github/copilot-instructions.md` |
 
 ## What Goes in BASELINE.md
 
@@ -42,30 +99,22 @@ That's it. No config files, no plugins, no dependencies.
 | Boundaries | What NOT to touch | "Never modify safety_monitor.c without approval" |
 | Owner Approval | Change control log | "2024-03-20: Approved T5 scope change" |
 
-## Rules
+## BASELINE.md Format Rules
 
 1. **Lean**: Each field, 1-3 lines max. No history logs.
 2. **Current state only**: BASELINE is a snapshot, not a changelog.
 3. **Completed tasks**: ID + name + date only. No details.
-4. **Before any task**: Read BASELINE to confirm state and boundaries.
-5. **After any task**: Update BASELINE with new state.
-6. **No deploy/release without owner approval.**
-7. **On "baseline restore" command**: Read BASELINE, restore full context, then respond.
 
 ## Why It Works
 
-AI assistants are excellent at following structured instructions — if those instructions exist in context. BASELINE.md ensures critical project state is always in context, without manual re-explanation.
+Karpathy's insight: *"LLMs are very good at looping until a specific goal is met — don't tell it what to do, give it success criteria and let it execute."*
 
-The file is deliberately minimal. A 15-line file that the AI actually reads is infinitely more valuable than a 500-line document that the AI ignores.
+This project extends that insight: the same LLM capability works for context management — if the context exists in a structured, minimal file that the AI reads at session start. A 15-line `BASELINE.md` that the AI actually reads beats a 500-page wiki that it ignores.
 
-## Compatible With
+## Acknowledgments
 
-- Claude Code (add to `CLAUDE.md` or `.claude/settings.json`)
-- Cursor (add to `.cursor/rules/`)
-- Windsurf (add to `.windsurfrules`)
-- WorkBuddy (use as skill reference)
-- GitHub Copilot (add to `.github/copilot-instructions.md`)
-- Any tool that reads project files — just put `BASELINE.md` in your root
+- Rules 1-4 are based on [Andrej Karpathy](https://github.com/karpathy)'s public observations on LLM coding behavior, as popularized by [forrestchang/andrej-karpathy-skills](https://github.com/forrestchang/andrej-karpathy-skills).
+- Rule 5 (Baseline Context) and the `BASELINE.md` template are original contributions.
 
 ## License
 
@@ -73,4 +122,4 @@ MIT
 
 ---
 
-**Karpathy's rules make AI code better. BASELINE makes AI remember. Use both.**
+**Karpathy's rules make AI code better. Barton's baseline makes AI remember. Fused into one.**
